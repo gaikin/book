@@ -1,0 +1,45 @@
+
+
+
+sql = "INSERT INTO allbooks values(%s,%s,%s,%s,%s,%s,%s,%s,%s)"  # 这是一条sql插入语句
+cur.executemany(sql, l)  # 执行sql语句，并用executemary()函数批量插入数据库中
+conn.commit()
+
+# 主函数到此结束
+
+
+# 将Python连接到MySQL中的python数据库中
+conn = pymysql.connect(user="root", password="123123", database="python", charset='utf8')
+cur = conn.cursor()
+
+cur.execute('DROP TABLE IF EXISTS allbooks')  # 如果数据库中有allbooks的数据库则删除
+sql = """CREATE TABLE allbooks(
+        title CHAR(255) NOT NULL,
+        scor CHAR(255),
+        author CHAR(255),
+        price CHAR(255),
+        time CHAR(255),
+        publish CHAR(255),
+        person CHAR(255),
+        yizhe CHAR(255),
+        tag CHAR(255)
+ )"""
+cur.execute(sql)  # 执行sql语句，新建一个allbooks的数据库
+
+start = time.clock()  # 设置一个时钟，这样我们就能知道我们爬取了多长时间了
+for urls in channel.split():
+    urlss = [urls + "?start={}&type=T".format(str(i)) for i in range(0, 980, 20)]  # 从channel中提取url信息，并组装成每一页的链接
+    for url in urlss:
+        mains(url)  # 执行主函数，开始爬取
+        print(url)  # 输出要爬取的链接，这样我们就能知道爬到哪了，发生错误也好处理
+        time.sleep(int(format(random.randint(0, 9))))  # 设置一个随机数时间，每爬一个网页可以随机的停一段时间，防止IP被封
+end = time.clock()
+print('Time Usage:', end - start)  # 爬取结束，输出爬取时间
+count = cur.execute('select * from allbooks')
+print('has %s record' % count)  # 输出爬取的总数目条数
+
+# 释放数据连接
+if cur:
+    cur.close()
+if conn:
+    conn.close()
